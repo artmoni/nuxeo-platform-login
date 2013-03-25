@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,6 +13,7 @@
  *
  * Contributors:
  *     Nelson Silva <nelson.silva@inevo.pt> - initial API and implementation
+ *     jcarsique
  *     Nuxeo
  */
 
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.nuxeo.ecm.platform.api.login.UserIdentificationInfo;
 import org.nuxeo.ecm.platform.oauth2.openid.OpenIDConnectProvider;
 import org.nuxeo.ecm.platform.oauth2.openid.OpenIDConnectProviderRegistry;
@@ -55,6 +57,8 @@ public class OpenIDConnectAuthenticator implements NuxeoAuthenticationPlugin {
 
     public static final String PROVIDER_URL_PARAM_NAME = "provider";
 
+    public static final String TOKEN_URL_PARAM_NAME = "token";
+
     public static final String USERINFO_KEY = "OPENID_USERINFO";
 
     public static final String PROPERTY_OAUTH_CREATE_USER = "nuxeo.oauth.auth.create.user";
@@ -67,58 +71,39 @@ public class OpenIDConnectAuthenticator implements NuxeoAuthenticationPlugin {
 
     public UserIdentificationInfo retrieveIdentityFromOAuth(
             HttpServletRequest req, HttpServletResponse resp) {
-
-        // Getting the "error" URL parameter
-        String error = req.getParameter(ERROR_URL_PARAM_NAME);
-
-        // / Checking if there was an error such as the user denied access
-        if (error != null && error.length() > 0) {
-            sendError(req, "There was an error: \"" + error + "\".");
-            return null;
-        }
-
-        // Getting the "code" URL parameter
-        String code = req.getParameter(CODE_URL_PARAM_NAME);
-
-        // Checking conditions on the "code" URL parameter
-        if (code == null || code.isEmpty()) {
-            sendError(req, "There was an error: \"" + code + "\".");
-            return null;
-        }
-
-        // Getting the "provider" URL parameter
         String serviceProviderName = req.getParameter(PROVIDER_URL_PARAM_NAME);
-
-        // Checking conditions on the "provider" URL parameter
         if (serviceProviderName == null || serviceProviderName.isEmpty()) {
             sendError(req, "Missing OpenID Connect Provider ID.");
             return null;
         }
-
+        OpenIDConnectProviderRegistry registry = Framework.getLocalService(OpenIDConnectProviderRegistry.class);
+        OpenIDConnectProvider provider = registry.getProvider(serviceProviderName);
+        if (provider == null) {
+            sendError(req, "No service provider called: \""
+                    + serviceProviderName + "\".");
+            return null;
+        }
         try {
-            OpenIDConnectProviderRegistry registry = Framework.getLocalService(OpenIDConnectProviderRegistry.class);
-            OpenIDConnectProvider provider = registry.getProvider(serviceProviderName);
-
-            if (provider == null) {
-                sendError(req, "No service provider called: \""
-                        + serviceProviderName + "\".");
-                return null;
-            }
-
             // Check the state token
-
             if (!Framework.isBooleanPropertyTrue(PROPERTY_SKIP_OAUTH_TOKEN)
                     && !provider.verifyStateToken(req)) {
                 sendError(req, "Invalid state parameter.");
             }
 
-            // Validate the token
-            String accessToken = provider.getAccessToken(req, code);
-
+            String accessToken = req.getParameter(TOKEN_URL_PARAM_NAME);
+            if (accessToken == null) {
+                String code = req.getParameter(CODE_URL_PARAM_NAME);
+                if (code == null || code.isEmpty()) {
+                    sendError(req, "There was an error: \"" + code + "\".");
+                    return null;
+                }
+                accessToken = provider.getAccessToken(req, code);
+            } else {
+                log.debug("Using token: " + accessToken);
+            }
             if (accessToken == null) {
                 return null;
             }
-
             OpenIDUserInfo info = provider.getUserInfo(accessToken);
 
             // Store the user info as a key in the request so apps can use it
@@ -135,7 +120,6 @@ public class OpenIDConnectAuthenticator implements NuxeoAuthenticationPlugin {
             }
 
             if (userId == null) {
-
                 sendError(req, "No user found with email: \"" + info.getEmail()
                         + "\".");
                 return null;
@@ -152,21 +136,18 @@ public class OpenIDConnectAuthenticator implements NuxeoAuthenticationPlugin {
 
     @Override
     public List<String> getUnAuthenticatedURLPrefix() {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     @Override
     public UserIdentificationInfo handleRetrieveIdentity(
             HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         String error = httpRequest.getParameter(ERROR_URL_PARAM_NAME);
-        String code = httpRequest.getParameter(CODE_URL_PARAM_NAME);
-        String serviceProviderName = httpRequest.getParameter(PROVIDER_URL_PARAM_NAME);
-        if (serviceProviderName == null) {
+        if (error != null && error.length() > 0) {
+            sendError(httpRequest, "There was an error: \"" + error + "\".");
             return null;
         }
-        if (code == null && error == null) {
-            return null;
-        }
+
         UserIdentificationInfo userIdent = retrieveIdentityFromOAuth(
                 httpRequest, httpResponse);
         if (userIdent != null) {
