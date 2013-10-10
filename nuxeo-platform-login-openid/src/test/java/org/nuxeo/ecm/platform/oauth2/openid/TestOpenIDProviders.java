@@ -1,6 +1,7 @@
 package org.nuxeo.ecm.platform.oauth2.openid;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nuxeo.ecm.core.test.CoreFeature;
@@ -32,7 +33,14 @@ public class TestOpenIDProviders {
 
         OpenIDConnectProvider provider2 = registry.getProvider("TestingGoogleOpenIDConnect2");
         Assert.assertNotNull(provider2);
+    }
 
+    @Test
+    @Ignore
+    public void retrieveUserInfo() {
+        OpenIDConnectProviderRegistry registry = Framework.getLocalService(OpenIDConnectProviderRegistry.class);
+        OpenIDConnectProvider provider = registry.getProvider("TestingGoogleOpenIDConnect3");
+        provider.getAccessToken(null, null);
     }
 
 }

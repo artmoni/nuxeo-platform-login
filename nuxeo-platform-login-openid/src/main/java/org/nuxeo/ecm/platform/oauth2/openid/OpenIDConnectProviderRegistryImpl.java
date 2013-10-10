@@ -4,7 +4,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -71,7 +71,7 @@ public class OpenIDConnectProviderRegistryImpl extends DefaultComponent
                 provider.setEnabled(false);
             }
             log.info("OpenId provider for " + provider.getName()
-                    + " will be registred at application startup");
+                    + " will be registered at application startup");
             // delay registration because data sources may not be available
             // at this point
             pendingProviders.addContribution(provider);
