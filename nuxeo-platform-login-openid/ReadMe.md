@@ -26,8 +26,8 @@ Once you have the clientId/clientSecret, create `nxserver/config/openid-config.x
       </extension>
     </component>
 
+## Configuration parameters (for nuxeo.conf)
 
-
-
+openid.createuser: create user if needed, property is true and the user's openId is validated
 
 
