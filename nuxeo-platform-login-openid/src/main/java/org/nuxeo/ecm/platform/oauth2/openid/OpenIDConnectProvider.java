@@ -4,7 +4,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,10 +46,10 @@ import com.google.api.client.json.jackson.JacksonFactory;
 /**
  * Class that holds info about an OpenID provider, this includes an OAuth
  * Provider as well as urls and icons
- * 
+ *
  * @author Nelson Silva <nelson.silva@inevo.pt>
  * @author <a href="mailto:tdelprat@nuxeo.com">Tiry</a>
- * 
+ *
  */
 public class OpenIDConnectProvider implements LoginProviderLinkComputer {
 
@@ -89,9 +89,7 @@ public class OpenIDConnectProvider implements LoginProviderLinkComputer {
                 HTTP_TRANSPORT, JSON_FACTORY);
         AuthorizationCodeRequestUrl authorizationUrl = flow.newAuthorizationUrl(); // .setResponseTypes("token");
         authorizationUrl.setRedirectUri(getRedirectUri(req));
-
         String authUrl = authorizationUrl.build();
-
         return authUrl;
     }
 
@@ -105,21 +103,18 @@ public class OpenIDConnectProvider implements LoginProviderLinkComputer {
 
     public String getAccessToken(HttpServletRequest req, String code) {
         String accessToken = null;
-
         HttpResponse response = null;
-
         try {
             AuthorizationCodeFlow flow = oauth2Provider.getAuthorizationCodeFlow(
                     HTTP_TRANSPORT, JSON_FACTORY);
-
             String redirectUri = getRedirectUri(req);
             response = flow.newTokenRequest(code).setRedirectUri(redirectUri).executeUnparsed();
         } catch (IOException e) {
             log.error("Error during OAuth2 Authorization", e);
+            return null;
         }
 
         String type = response.getContentType();
-
         try {
             if (type.contains("text/plain")) {
                 String str = response.parseAsString();
@@ -132,15 +127,18 @@ public class OpenIDConnectProvider implements LoginProviderLinkComputer {
                     }
                 }
             } else { // try to parse as JSON
-
                 TokenResponse tokenResponse = response.parseAs(TokenResponse.class);
                 accessToken = tokenResponse.getAccessToken();
-
             }
         } catch (IOException e) {
             log.error("Unable to parse server response", e);
+        } finally {
+            try {
+                response.disconnect();
+            } catch (IOException e) {
+                log.debug(e, e);
+            }
         }
-
         return accessToken;
     }
 
@@ -156,16 +154,22 @@ public class OpenIDConnectProvider implements LoginProviderLinkComputer {
 
         GenericUrl url = new GenericUrl(userInfoURL);
         url.set("access_token", accessToken);
-
+        HttpResponse response = null;
         try {
             HttpRequest request = requestFactory.buildGetRequest(url);
-            HttpResponse response = request.execute();
+            response = request.execute();
             userInfo = response.parseAs(OpenIdUserInfo.class);
-
         } catch (IOException e) {
             log.error("Unable to parse server response", e);
+        } finally {
+            try {
+                if (response != null) {
+                    response.disconnect();
+                }
+            } catch (IOException e) {
+                log.debug(e, e);
+            }
         }
-
         return userInfo;
     }
 
@@ -176,6 +180,30 @@ public class OpenIDConnectProvider implements LoginProviderLinkComputer {
     @Override
     public String computeUrl(HttpServletRequest req, String requestedUrl) {
         return getAuthenticationUrl(req, requestedUrl);
+    }
+
+    /**
+     *
+     * Requests a new access token from a refresh token
+     * TODO NXP-12775
+     *
+     * @since 5.8
+     */
+    public String getNewAccessToken(HttpServletRequest httpRequest,
+            String refresh) {
+        throw new UnsupportedOperationException(
+                "TODO NXP-12775 implement use of refresh token");
+    }
+
+    /**
+     * Parse an ID token to extract user infos
+     *
+     * @since 5.8
+     */
+    public OpenIdUserInfo parseUserInfo(String idToken) {
+        // TODO Auto-generated method stub
+        // return null;
+        throw new UnsupportedOperationException();
     }
 
 }
