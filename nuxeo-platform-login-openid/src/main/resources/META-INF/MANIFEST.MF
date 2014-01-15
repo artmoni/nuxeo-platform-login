@@ -6,4 +6,5 @@ Nuxeo-Component: OSGI-INF/auth-contrib.xml,
  OSGI-INF/openid-connect-provider-registry.xml,
  OSGI-INF/openid-google-contrib.xml,
  OSGI-INF/openid-facebook-contrib.xml
+ OSGI-INF/user-profile-oauth.xml
 Bundle-SymbolicName: org.nuxeo.ecm.platform.login.openid;singleton:=true
