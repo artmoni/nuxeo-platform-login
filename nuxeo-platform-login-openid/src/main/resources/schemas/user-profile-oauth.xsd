@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<xs:schema targetNamespace="http://www.nuxeo.core/ecm/schemas/userprofile/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:nxs="http://www.nuxeo.core/ecm/schemas/userprofile/">
+
+  <xs:include schemaLocation="userprofile.xsd" />
+
+  <xs:element name="googleid" type="xs:string" />
+  <xs:element name="displayname" type="xs:string" />
+  <xs:element name="url" type="xs:string" />
+  <xs:element name="imageurl" type="xs:string" />
+</xs:schema>
+
+<!--
+{
+     * "kind": "plus#person",
+     * "etag": "\"LTv_6IJISeUQGTVXLjMeOtebkoM/yQDt23lqidObGrf1Slt734cfonM\"",
+     * "objectType": "person",
+     * "id": "103452520282063622981",
+     * "displayName": "Surname name",
+     * "url": "https://profiles.google.com/103452523282063622981",
+     * "image": {
+     * "url": "https://lh4.googleusercontent.com/-eBavB406LE0/AAAAAAAAAAI/AAAAAAAAAAA/luk3KERL5Go/photo.jpg?sz=50"
+     * }
+-->
