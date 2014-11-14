@@ -11,30 +11,31 @@
     <ui:define name="groups_search_method">
       <a4j:region id="search_groups_region">
         <!-- search form -->
-        <a4j:form id="searchForm">
+        <h:form id="searchForm">
           <h:inputText id="searchText"
             value="#{shibbGroupManagerActions.searchString}"
             onkeydown="if(event.keyCode == 13 ||event.keyCode == 9 ){return false;}"
             styleClass="directoryFilter">
-            <a4j:support event="onkeyup" reRender="groupsListingPanel"
-              requestDelay="1000" action="#{contentViewActions.refreshAndRewind(contentViewName)}"
-              ignoreDupResponses="true" />
+            <a4j:ajax event="keyup" render="groupsListingPanel"
+              listener="#{contentViewActions.refreshAndRewind(contentViewName)}">
+              <a4j:attachQueue ignoreDupResponses="true" requestDelay="1000" />
+            </a4j:ajax>
           </h:inputText>
           <f:verbatim>&amp;nbsp;</f:verbatim>
           <a4j:commandButton id="searchButton"
             value="#{messages['command.search']}"
             action="#{contentViewActions.refreshAndRewind(contentViewName)}" styleClass="button"
-            reRender="groupsPanel" />
+            render="groupsPanel" />
           <a4j:commandButton id="clearButton"
             value="#{messages['command.clearSearch']}"
             action="#{shibbGroupManagerActions.clearSearch}" styleClass="button"
-            reRender="groupsPanel" />
+            render="groupsPanel" />
           <a4j:status>
             <f:facet name="start">
               <h:graphicImage value="/img/standart_waiter.gif" />
             </f:facet>
           </a4j:status>
-        </a4j:form>
+        </h:form>
       </a4j:region>
     </ui:define>
 

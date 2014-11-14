@@ -48,6 +48,7 @@
     </documentation>
 
     <specificAuthenticationChain name="Automation">
+
       <urlPatterns>
         <url>(.*)/automation.*</url>
       </urlPatterns>
@@ -57,6 +58,19 @@
         <plugin>ANONYMOUS_AUTH</plugin>
       </replacementChain>
     </specificAuthenticationChain>
+
+    <specificAuthenticationChain name="RestAPI">
+      <urlPatterns>
+        <url>(.*)/api/v.*</url>
+      </urlPatterns>
+      <replacementChain>
+        <plugin>AUTOMATION_BASIC_AUTH</plugin>
+        <plugin>TOKEN_AUTH</plugin>
+        <plugin>ANONYMOUS_AUTH</plugin>
+      </replacementChain>
+    </specificAuthenticationChain>
+
+
 
     <documentation>
       Use token authentication if the related request

@@ -19,11 +19,21 @@
       <include>l10n/**</include>
     </unzip>
 
-    <append from="nxdeputy.tmp/l10n/messages.properties"
+    <append from="nxdeputy.tmp/l10n/messages_en_US.properties"
       to="nuxeo.war/WEB-INF/classes/messages.properties"
       addNewLine="true" />
+    <append from="nxdeputy.tmp/l10n/messages_en_US.properties"
+      to="nuxeo.war/WEB-INF/classes/messages_en.properties"
+      addNewLine="true" />
+    <append from="nxdeputy.tmp/l10n/messages_en_US.properties"
+      to="nuxeo.war/WEB-INF/classes/messages_en_US.properties"
+      addNewLine="true" />
       
-   <append from="nxdeputy.tmp/l10n/messages_fr.properties"
+   <append from="nxdeputy.tmp/l10n/messages_fr_FR.properties"
+      to="nuxeo.war/WEB-INF/classes/messages_fr_FR.properties"
+      addNewLine="true" />
+      
+   <append from="nxdeputy.tmp/l10n/messages_fr_FR.properties"
       to="nuxeo.war/WEB-INF/classes/messages_fr.properties"
       addNewLine="true" />
 

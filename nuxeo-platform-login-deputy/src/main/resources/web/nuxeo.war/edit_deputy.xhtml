@@ -7,7 +7,7 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:c="http://java.sun.com/jstl/core"
 	xmlns:t="http://myfaces.apache.org/tomahawk"
-	xmlns:a4j="https://ajax4jsf.dev.java.net/ajax">
+	xmlns:a4j="http://richfaces.org/a4j">
 
 	<ui:define name="page title">Nuxeo 5 EP</ui:define>
 
@@ -70,7 +70,7 @@
 							<td><h:selectBooleanCheckbox
 									value="#{editableDeputy.deputies.validateDate}"
 									immediate="true">
-									<a4j:support event="onclick" reRender="deputy_edit_div" />
+									<a4j:ajax event="click" render="deputy_edit_div" />
 								</h:selectBooleanCheckbox>
 							</td>
 						</tr>

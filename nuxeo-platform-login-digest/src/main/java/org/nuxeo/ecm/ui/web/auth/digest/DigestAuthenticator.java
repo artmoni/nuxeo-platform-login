@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2010-2011 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2010-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,20 +20,23 @@ package org.nuxeo.ecm.ui.web.auth.digest;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import au.com.bytecode.opencsv.CSVReader;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.nuxeo.ecm.platform.api.login.UserIdentificationInfo;
 import org.nuxeo.ecm.platform.ui.web.auth.interfaces.NuxeoAuthenticationPlugin;
 
@@ -47,6 +50,10 @@ public class DigestAuthenticator implements NuxeoAuthenticationPlugin {
     protected static final String DEFAULT_REALMNAME = "NUXEO";
 
     protected static final long DEFAULT_NONCE_VALIDITY_SECONDS = 1000;
+
+    protected static final String EQUAL_SEPARATOR = "=";
+
+    protected static final String QUOTE = "\"";
 
     /*
      * match the first portion up until an equals sign
@@ -120,7 +127,6 @@ public class DigestAuthenticator implements NuxeoAuthenticationPlugin {
          * I have used this property to transfer response parameters to
          * DigestLoginPlugin But loginParameters rewritten in
          * NuxeoAuthenticationFilter common implementation
-         *
          * @TODO: Fix this or find new way to transfer properties to LoginPlugin
          */
         userIdent.setLoginParameters(headerMap);
@@ -149,35 +155,24 @@ public class DigestAuthenticator implements NuxeoAuthenticationPlugin {
     }
 
     public static Map<String, String> splitParameters(String auth) {
-        Map<String, String> map = new HashMap<String, String>();
-        CSVReader reader = null;
-        try {
-            reader = new CSVReader(new StringReader(auth));
-            String[] array = null;
-            try {
-                array = reader.readNext();
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-                return map;
-            }
-            for (String itemPairStr : array) {
-                Matcher match = PAIR_ITEM_PATTERN.matcher(itemPairStr);
-                if (match.find()) {
-                    String key = match.group(1);
-                    String value = match.group(3);
-                    map.put(key.trim(), value.trim());
-                } else {
-                    log.warn("Could not parse item pair " + itemPairStr);
+        Map<String, String> map = new HashMap<>();
+        try (CSVParser reader = new CSVParser(new StringReader(auth),
+                CSVFormat.DEFAULT)) {
+            Iterator<CSVRecord> iterator = reader.iterator();
+            if (iterator.hasNext()) {
+                CSVRecord record = iterator.next();
+                for (String itemPairStr : record) {
+                    itemPairStr = StringUtils.remove(itemPairStr, QUOTE);
+                    String[] parts = itemPairStr.split(EQUAL_SEPARATOR, 2);
+                    if (parts == null) {
+                        continue;
+                    } else {
+                        map.put(parts[0].trim(), parts[1].trim());
+                    }
                 }
             }
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ioe) {
-                    log.error("Could not close reader", ioe);
-                }
-            }
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
         }
         return map;
     }
