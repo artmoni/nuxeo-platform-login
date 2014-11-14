@@ -25,4 +25,10 @@ public class OpenIdUserInfo extends GenericJson {
 
     @Key("email")
     public String email;
+
+    @Key("given_name")
+    public String givenName;
+
+    @Key("family_name")
+    public String familyName;
 }

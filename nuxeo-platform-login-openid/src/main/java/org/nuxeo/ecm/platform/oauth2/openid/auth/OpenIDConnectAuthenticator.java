@@ -32,7 +32,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.platform.api.login.UserIdentificationInfo;
+import org.nuxeo.ecm.platform.login.PrincipalImpl;
 import org.nuxeo.ecm.platform.oauth2.openid.OpenIDConnectProvider;
 import org.nuxeo.ecm.platform.oauth2.openid.OpenIDConnectProviderRegistry;
 import org.nuxeo.ecm.platform.ui.web.auth.interfaces.NuxeoAuthenticationPlugin;
@@ -158,6 +160,10 @@ public class OpenIDConnectAuthenticator implements NuxeoAuthenticationPlugin {
                             + userManager.getUserEmailField(), info.email);
                     user.setPropertyValue(userManager.getUserSchemaName() + ":"
                             + userManager.getUserIdField(), info.email);
+                    user.setPropertyValue(userManager.getUserSchemaName() + ":"
+                            + "firstName", info.givenName);
+                    user.setPropertyValue(userManager.getUserSchemaName() + ":"
+                            + "lastName", info.familyName);
                     userManager.createUser(user);
                     userId = info.email;
                 } catch (ClientException e) {
