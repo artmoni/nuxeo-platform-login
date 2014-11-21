@@ -54,8 +54,8 @@ public class StoredUserInfoResolver extends UserResolver {
             }
 
         } catch (ClientException e) {
-            log.error("Error while search user in UserManager using email "
-                    + userInfo.getEmail(), e);
+            log.error("Error while search user in UserManager using login "
+                    + nuxeoLogin, e);
             return null;
         }
         return nuxeoLogin;
