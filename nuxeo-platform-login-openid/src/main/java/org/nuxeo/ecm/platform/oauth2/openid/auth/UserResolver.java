@@ -53,22 +53,27 @@ public abstract class UserResolver {
             userDoc = userManager.getBareUserModel();
             userDoc.setPropertyValue(userManager.getUserIdField(), nuxeoLogin);
 
-            userManager.createUser(userDoc);
+            userDoc = userManager.createUser(userDoc);
 
         } catch (ClientException e) {
-            log.error("Error while creating user " + nuxeoLogin + "in UserManager", e);
+            log.error("Error while creating user " + nuxeoLogin
+                    + "in UserManager", e);
             return null;
         }
 
         return userDoc;
     }
 
-    public abstract DocumentModel updateUserInfo(DocumentModel user, OpenIDUserInfo userInfo);
+    public abstract DocumentModel updateUserInfo(DocumentModel user,
+            OpenIDUserInfo userInfo);
 
     public String findOrCreateNuxeoUser(OpenIDUserInfo userInfo) {
         String user = findNuxeoUser(userInfo);
         if (user == null) {
-            user = generateRandomUserId();
+            if (userInfo.getEmail() != null)
+                user = userInfo.getEmail();
+            else
+                user = generateRandomUserId();
             DocumentModel userDoc = createNuxeoUser(user);
             updateUserInfo(userDoc, userInfo);
         }

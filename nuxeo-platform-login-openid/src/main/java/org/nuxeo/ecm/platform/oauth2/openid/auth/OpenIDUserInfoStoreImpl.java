@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.directory.DirectoryException;
@@ -84,7 +85,7 @@ public class OpenIDUserInfoStoreImpl implements OpenIDUserInfoStore {
             data.put("locale", userInfo.getLocale());
             data.put("phone_number", userInfo.getPhoneNumber());
             data.put("address", userInfo.getAddress());
-            data.put("updated_time", userInfo.getUpdatedTime());
+//            data.put("updated_time", userInfo.getUpdatedTime());
 
             if (session.hasEntry(userInfoId)) {
                 DocumentModel userInfoDoc = session.getEntry(userInfoId);
@@ -95,7 +96,7 @@ public class OpenIDUserInfoStoreImpl implements OpenIDUserInfoStore {
                 session.createEntry(data);
             }
 
-        } catch (DirectoryException e) {
+        } catch (Exception e) {
             log.error("Error during token storage", e);
         } finally {
             if (session != null) {
