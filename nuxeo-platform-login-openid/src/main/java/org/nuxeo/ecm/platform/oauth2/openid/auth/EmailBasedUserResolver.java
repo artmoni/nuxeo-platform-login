@@ -47,7 +47,7 @@ public class EmailBasedUserResolver extends UserResolver {
     }
 
     @Override
-    public String findNuxeoUser(OpenIDUserInfo userInfo) {
+    public DocumentModel findNuxeoUser(OpenIDUserInfo userInfo) {
 
         try {
             UserManager userManager = Framework.getLocalService(UserManager.class);
@@ -61,7 +61,7 @@ public class EmailBasedUserResolver extends UserResolver {
             }
 
             DocumentModel user = users.get(0);
-            return (String) user.getPropertyValue(userManager.getUserIdField());
+            return user;
 
         } catch (ClientException e) {
             log.error("Error while search user in UserManager using email "

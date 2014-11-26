@@ -42,7 +42,7 @@ public abstract class UserResolver {
         return provider;
     }
 
-    public abstract String findNuxeoUser(OpenIDUserInfo userInfo);
+    public abstract DocumentModel findNuxeoUser(OpenIDUserInfo userInfo);
 
     public DocumentModel createNuxeoUser(String nuxeoLogin) {
         DocumentModel userDoc;
@@ -68,15 +68,16 @@ public abstract class UserResolver {
             OpenIDUserInfo userInfo);
 
     public String findOrCreateNuxeoUser(OpenIDUserInfo userInfo) {
-        String user = findNuxeoUser(userInfo);
+        DocumentModel userDoc=findNuxeoUser(userInfo);
+        String user =userDoc.getId();
         if (user == null) {
             if (userInfo.getEmail() != null)
                 user = userInfo.getEmail();
             else
                 user = generateRandomUserId();
-            DocumentModel userDoc = createNuxeoUser(user);
-            updateUserInfo(userDoc, userInfo);
+            userDoc = createNuxeoUser(user);
         }
+        updateUserInfo(userDoc, userInfo);
         return user;
     }
 
