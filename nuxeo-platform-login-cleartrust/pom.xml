@@ -3,7 +3,11 @@
   <parent>
     <groupId>org.nuxeo.ecm.platform</groupId>
     <artifactId>nuxeo-platform-login-parent</artifactId>
+<<<<<<< HEAD
     <version>7.1-SNAPSHOT</version>
+=======
+    <version>6.0</version>
+>>>>>>> br_6_0_gots
   </parent>
   
   <artifactId>nuxeo-platform-login-cleartrust</artifactId>

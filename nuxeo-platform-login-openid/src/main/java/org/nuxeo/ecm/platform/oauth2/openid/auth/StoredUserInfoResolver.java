@@ -44,21 +44,24 @@ public class StoredUserInfoResolver extends UserResolver {
     }
 
     @Override
-    public String findNuxeoUser(OpenIDUserInfo userInfo) {
+    public DocumentModel findNuxeoUser(OpenIDUserInfo userInfo) {
         String nuxeoLogin = getUserInfoStore().getNuxeoLogin(userInfo);
+        DocumentModel userDoc;
         // Check if the user exists
         try {
             UserManager userManager = Framework.getLocalService(UserManager.class);
-            if (userManager.getUserModel(nuxeoLogin) == null) {
-                nuxeoLogin = null;
-            }
+            userDoc=userManager.getUserModel(nuxeoLogin);
+//            if (userManager.getUserModel(nuxeoLogin) == null) {
+//                nuxeoLogin = null;
+//                
+//            }
 
         } catch (ClientException e) {
-            log.error("Error while search user in UserManager using email "
-                    + userInfo.getEmail(), e);
+            log.error("Error while search user in UserManager using login "
+                    + nuxeoLogin, e);
             return null;
         }
-        return nuxeoLogin;
+        return userDoc;
     }
 
     @Override

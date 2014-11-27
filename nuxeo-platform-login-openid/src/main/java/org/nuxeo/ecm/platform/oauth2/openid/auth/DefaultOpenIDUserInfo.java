@@ -176,6 +176,7 @@ public class DefaultOpenIDUserInfo extends GenericJson implements OpenIDUserInfo
     public Date getUpdatedTime() {
         Date date;
         try {
+            //TODO raise nullpointer if updatedTime is null
             DateTime dateTime = DateTime.parseRfc3339(updatedTime);
             date = new Date(dateTime.getValue());
         } catch (NumberFormatException e) {

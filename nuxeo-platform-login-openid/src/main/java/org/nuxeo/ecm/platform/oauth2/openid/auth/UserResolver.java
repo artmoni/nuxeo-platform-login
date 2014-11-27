@@ -48,26 +48,34 @@ public abstract class UserResolver {
 
     public DocumentModel createNuxeoUser(String nuxeoLogin) {
         DocumentModel userDoc;
+
         try {
             UserManager userManager = Framework.getLocalService(UserManager.class);
+
             userDoc = userManager.getBareUserModel();
             userDoc.setPropertyValue(userManager.getUserIdField(), nuxeoLogin);
+
             userManager.createUser(userDoc);
+
         } catch (ClientException e) {
             log.error("Error while creating user " + nuxeoLogin + "in UserManager", e);
             return null;
         }
+
         return userDoc;
     }
 
     public abstract DocumentModel updateUserInfo(DocumentModel user, OpenIDUserInfo userInfo);
 
     public String findOrCreateNuxeoUser(OpenIDUserInfo userInfo) {
-        String user = findNuxeoUser(userInfo);
+        DocumentModel userDoc=findNuxeoUser(userInfo);
+        String user =userDoc.getId();
         if (user == null) {
-            user = generateRandomUserId();
-            DocumentModel userDoc = createNuxeoUser(user);
-            updateUserInfo(userDoc, userInfo);
+            if (userInfo.getEmail() != null)
+                user = userInfo.getEmail();
+            else
+                user = generateRandomUserId();
+            userDoc = createNuxeoUser(user);
         }
         return user;
     }
