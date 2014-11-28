@@ -165,7 +165,7 @@ public class OpenIDConnectAuthenticator implements NuxeoAuthenticationPlugin {
         if (Framework.isBooleanPropertyTrue(PROPERTY_OAUTH_CREATE_USER)) {
             userId = userResolver.findOrCreateNuxeoUser(info);
         } else {
-            userId = userResolver.findNuxeoUser(info);
+            userId = userResolver.findNuxeoUser(info).getId();
         }
         if (userId == null) {
             sendError(httpRequest,

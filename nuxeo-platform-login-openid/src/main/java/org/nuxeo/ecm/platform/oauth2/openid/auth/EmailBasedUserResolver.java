@@ -35,7 +35,7 @@ import org.nuxeo.runtime.api.Framework;
 /**
  * Helper class to manage mapping between identification info comming from the
  * OpenID provider and Nuxeo UserManager.
- *
+ * 
  * @author <a href="mailto:tdelprat@nuxeo.com">Tiry</a>
  * @since 5.7
  */
@@ -72,16 +72,15 @@ public class EmailBasedUserResolver extends UserResolver {
     }
 
     @Override
-    public DocumentModel updateUserInfo(DocumentModel user, OpenIDUserInfo userInfo) {
+    public DocumentModel updateUserInfo(DocumentModel user,
+            OpenIDUserInfo userInfo) {
         try {
             UserManager userManager = Framework.getLocalService(UserManager.class);
             user.setPropertyValue(userManager.getUserEmailField(),
                     userInfo.getEmail());
- user.setPropertyValue("lastName",
-                    userInfo.getFamilyName());
-            user.setPropertyValue("firstName",
-                    userInfo.getGivenName());
-            
+            user.setPropertyValue("lastName", userInfo.getFamilyName());
+            user.setPropertyValue("firstName", userInfo.getGivenName());
+
             userManager.updateUser(user);
             // TODO JC: schema or not schema ? what about idField?
             // user.setPropertyValue(userManager.getUserSchemaName() + ":"

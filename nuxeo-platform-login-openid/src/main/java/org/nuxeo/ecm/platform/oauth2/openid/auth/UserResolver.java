@@ -44,7 +44,7 @@ public abstract class UserResolver {
         return provider;
     }
 
-    public abstract String findNuxeoUser(OpenIDUserInfo userInfo);
+    public abstract DocumentModel findNuxeoUser(OpenIDUserInfo userInfo);
 
     public DocumentModel createNuxeoUser(String nuxeoLogin) {
         DocumentModel userDoc;
@@ -77,6 +77,7 @@ public abstract class UserResolver {
                 user = generateRandomUserId();
             userDoc = createNuxeoUser(user);
         }
+        updateUserInfo(userDoc, userInfo);
         return user;
     }
 
